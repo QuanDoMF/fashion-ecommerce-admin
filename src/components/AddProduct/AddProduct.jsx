@@ -7,6 +7,7 @@ import * as yup from "yup"
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { API_ROOT } from "../../utils/constants";
+import SpinnerAddToProduct from "../SpinnerAddToProduct/SpinnerAddToProduct";
 const schema = yup.object({
   name: yup.string().required('Product title is required'),
   new_price: yup.string().required('Offer Price is required'),
@@ -16,15 +17,17 @@ const schema = yup.object({
 function AddProduct() {
 
   const [image, setImage] = useState(false)
-
+  const [loading, setLoading] = useState(false)
   const imageHandler = (e) => {
     setImage(e.target.files[0]);
   }
 
   const handleFormSubmit = async (data) => {
+    setLoading(true);
     if (!image) {
       // Kiểm tra xem người dùng đã tải ảnh lên chưa
       toast.error('Please upload an image.');
+      setLoading(false);
       return;
     }
     let product = { ...data, image: "" }
@@ -36,12 +39,14 @@ function AddProduct() {
         product.image = responseData.data.image_url
         // console.log("product", product)
         let resonseFormData = await axios.post(`${API_ROOT}/addproduct`, product)
+        setLoading(false);
         toast.success('Product Added')
         reset()
         setImage(false)
         // console.log("resonseFormData", resonseFormData)
       } else {
         toast.error('')
+        setLoading(false);
       }
     }
     catch (error) {
@@ -54,6 +59,7 @@ function AddProduct() {
   return (
     <div className="add-product">
       <form onSubmit={handleSubmit(handleFormSubmit)}>
+        {loading && <SpinnerAddToProduct />}
         <div className="addproduct-itemfield">
           <p>Product title</p>
           <input

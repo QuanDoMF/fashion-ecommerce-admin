@@ -10,17 +10,17 @@ import { API_ROOT } from "../../utils/constants";
 function Admin() {
   const [loading, setLoading] = useState('true')
   const [orderList, setOrderList] = useState([])
+  useEffect(() => {
+    fetchOrderList()
+  }, [])
   const fetchOrderList = async () => {
     await fetch(`${API_ROOT}/orderlist`)
       .then((res) => res.json())
       .then((data) => {
         setOrderList(data)
+        setLoading('false')
       })
   }
-  useEffect(() => {
-    fetchOrderList()
-    setLoading('false')
-  }, [])
   return (
     <>
       {
